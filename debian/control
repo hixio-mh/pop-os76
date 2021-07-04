@@ -1,0 +1,23 @@
+Source: pop-default-settings
+Section: x11
+Priority: optional
+Maintainer: Jeremy Soller <jeremy@system76.com>
+Uploaders: Ian Santopietro <ian@system76.com>
+Build-Depends: debhelper (>= 10)
+Standards-Version: 3.9.8
+Homepage: https://github.com/system76/pop-default-settings
+
+Package: pop-default-settings
+Architecture: all
+Depends: ${misc:Depends},
+         base-files (>= 10),
+         libglib2.0-bin,
+         gnome-menus,
+         gnupg,
+         plymouth-theme-pop-basic,
+         pop-session,
+         pop-theme,
+         pop-wallpapers,
+         software-properties-common,
+Description: default settings for the Pop desktop
+ This package contains the default settings used by Pop.

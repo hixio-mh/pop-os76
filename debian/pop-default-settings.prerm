@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+
+# Make sure this is in sync with postinst
+package=pop-default-settings
+diverts=(
+    "/etc/gdm3/custom.conf=/etc/pop-os/gdm3/custom.conf"
+    "/etc/issue=/etc/pop-os/issue"
+    "/etc/issue.net=/etc/pop-os/issue.net"
+    "/etc/lsb-release=/etc/pop-os/lsb-release"
+    "/etc/os-release=/etc/pop-os/os-release"
+    "/usr/lib/os-release=/etc/pop-os/os-release"
+)
+
+case "$1" in
+    remove)
+        for divert in "${diverts[@]}"
+        do
+            source="${divert%%=*}"
+            dest="${divert#*=}"
+
+            if [ "$(dpkg-divert --listpackage "$source")" == "$package" ]
+            then
+                if [ -L "$source" ]
+                then
+                    rm "$source"
+                fi
+
+                dpkg-divert --remove --package "$package" --rename --divert "$source.diverted" "$source"
+            fi
+        done
+        ;;
+
+    *)
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
