@@ -1,0 +1,69 @@
+#!/bin/sh
+
+GTK_THEME="$(gsettings get org.gnome.desktop.interface gtk-theme)"
+case "$GTK_THEME" in
+"'Pop-light'" | "'Pop-slim'" | "'Pop-slim-light'" )
+    gsettings set org.gnome.desktop.interface gtk-theme "'Pop'"
+    ;;
+"'Pop-slim-dark'" )
+    gsettings set org.gnome.desktop.interface gtk-theme "'Pop-dark'"
+    ;;
+esac
+
+if [ -e "${HOME}/.cache/pop-app-folders" ]
+then
+    exit 0
+fi
+
+APP_FOLDER="org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Pop"
+
+gsettings reset-recursively "${APP_FOLDER}-Office/"
+gsettings set "${APP_FOLDER}-Office/" name "Office.directory"
+gsettings set "${APP_FOLDER}-Office/" translate true
+gsettings set "${APP_FOLDER}-Office/" apps "[
+'libreoffice-calc.desktop',
+'libreoffice-draw.desktop',
+'libreoffice-impress.desktop',
+'libreoffice-math.desktop',
+'libreoffice-startcenter.desktop',
+'libreoffice-writer.desktop'
+]"
+
+gsettings reset-recursively "${APP_FOLDER}-System/"
+gsettings set "${APP_FOLDER}-System/" name "System.directory"
+gsettings set "${APP_FOLDER}-System/" translate true
+gsettings set "${APP_FOLDER}-System/" apps "[
+'gnome-language-selector.desktop',
+'gnome-session-properties.desktop',
+'gnome-system-monitor.desktop',
+'im-config.desktop',
+'nm-connection-editor.desktop',
+'nvidia-settings.desktop',
+'org.gnome.baobab.desktop',
+'org.gnome.DiskUtility.desktop',
+'org.gnome.PowerStats.desktop',
+'org.gnome.seahorse.Application.desktop',
+'software-properties-gnome.desktop',
+'system76-driver.desktop',
+'system76-firmware.desktop'
+]"
+
+gsettings reset-recursively "${APP_FOLDER}-Utility/"
+gsettings set "${APP_FOLDER}-Utility/" name "X-GNOME-Utilities.directory"
+gsettings set "${APP_FOLDER}-Utility/" translate true
+gsettings set "${APP_FOLDER}-Utility/" apps "[
+'com.github.donadigo.eddy.desktop',
+'com.system76.Popsicle.desktop',
+'eog.desktop',
+'gucharmap.desktop',
+'info.desktop',
+'org.gnome.Evince.desktop',
+'org.gnome.FileRoller.desktop',
+'org.gnome.font-viewer.desktop',
+'org.gnome.Screenshot.desktop',
+'org.gnome.Totem.desktop',
+'simple-scan.desktop',
+'yelp.desktop'
+]"
+
+touch "${HOME}/.cache/pop-app-folders"
