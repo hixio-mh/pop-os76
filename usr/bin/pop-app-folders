@@ -1,0 +1,143 @@
+#!/bin/sh
+
+CACHE_PATH="${HOME}/.cache/pop-app-folders"
+
+if [ -e "${CACHE_PATH}" ]
+then
+    CACHE_VERSION="$(cat "${CACHE_PATH}")"
+    if [ -z "${CACHE_VERSION}" ]
+    then
+        CACHE_VERSION="0"
+    fi
+else
+    CACHE_VERSION="-1"
+fi
+
+APP_FOLDER="org.gnome.desktop.app-folders.folder:/org/gnome/desktop/app-folders/folders/Pop"
+
+if [ "${CACHE_VERSION}" -lt "0" ]
+then
+
+echo "Migrating to version 0"
+
+gsettings reset-recursively "${APP_FOLDER}-Office/"
+gsettings set "${APP_FOLDER}-Office/" name "Office"
+gsettings set "${APP_FOLDER}-Office/" translate true
+gsettings set "${APP_FOLDER}-Office/" apps "[
+'libreoffice-calc.desktop',
+'libreoffice-draw.desktop',
+'libreoffice-impress.desktop',
+'libreoffice-math.desktop',
+'libreoffice-startcenter.desktop',
+'libreoffice-writer.desktop'
+]"
+
+gsettings reset-recursively "${APP_FOLDER}-System/"
+gsettings set "${APP_FOLDER}-System/" name "System"
+gsettings set "${APP_FOLDER}-System/" translate true
+gsettings set "${APP_FOLDER}-System/" apps "[
+'gnome-language-selector.desktop',
+'gnome-session-properties.desktop',
+'gnome-system-monitor.desktop',
+'im-config.desktop',
+'nm-connection-editor.desktop',
+'nvidia-settings.desktop',
+'org.gnome.baobab.desktop',
+'org.gnome.DiskUtility.desktop',
+'org.gnome.PowerStats.desktop',
+'org.gnome.seahorse.Application.desktop',
+'software-properties-gnome.desktop',
+'system76-driver.desktop',
+'system76-firmware.desktop'
+]"
+
+gsettings reset-recursively "${APP_FOLDER}-Utility/"
+gsettings set "${APP_FOLDER}-Utility/" name "Utilities"
+gsettings set "${APP_FOLDER}-Utility/" translate true
+gsettings set "${APP_FOLDER}-Utility/" apps "[
+'com.github.donadigo.eddy.desktop',
+'com.system76.Popsicle.desktop',
+'gucharmap.desktop',
+'info.desktop',
+'org.gnome.eog.desktop',
+'org.gnome.Evince.desktop',
+'org.gnome.Extensions.desktop',
+'org.gnome.FileRoller.desktop',
+'org.gnome.font-viewer.desktop',
+'org.gnome.Screenshot.desktop',
+'org.gnome.Totem.desktop',
+'simple-scan.desktop',
+'yelp.desktop'
+]"
+
+echo "0" > "${CACHE_PATH}"
+
+fi
+
+if [ "${CACHE_VERSION}" -lt "1" ]
+then
+
+echo "Migrating to version 1"
+
+gsettings set "${APP_FOLDER}-Office/" name "Office"
+gsettings set "${APP_FOLDER}-System/" name "System"
+gsettings set "${APP_FOLDER}-Utility/" name "Utilities"
+
+GTK_THEME="$(gsettings get org.gnome.desktop.interface gtk-theme)"
+case "$GTK_THEME" in
+"'Pop-light'" | "'Pop-slim'" | "'Pop-slim-light'" )
+    gsettings set org.gnome.desktop.interface gtk-theme "'Pop'"
+    ;;
+"'Pop-slim-dark'" )
+    gsettings set org.gnome.desktop.interface gtk-theme "'Pop-dark'"
+    ;;
+esac
+
+echo "1" > "${CACHE_PATH}"
+
+fi
+
+if [ "${CACHE_VERSION}" -lt "2" ]
+then
+
+echo "Migrating to version 2"
+
+gsettings set "${APP_FOLDER}-Utility/" apps "[
+'com.github.donadigo.eddy.desktop',
+'com.system76.Popsicle.desktop',
+'gucharmap.desktop',
+'info.desktop',
+'org.gnome.eog.desktop',
+'org.gnome.Evince.desktop',
+'org.gnome.Extensions.desktop',
+'org.gnome.FileRoller.desktop',
+'org.gnome.font-viewer.desktop',
+'org.gnome.Screenshot.desktop',
+'org.gnome.Totem.desktop',
+'pop-cosmic-applications.desktop',
+'pop-cosmic-launcher.desktop',
+'pop-cosmic-workspaces.desktop',
+'simple-scan.desktop',
+'yelp.desktop'
+]"
+
+echo "2" > "${CACHE_PATH}"
+
+fi
+
+if [ "${CACHE_VERSION}" -lt "3" ]
+then
+
+echo "Migrating to version 3"
+
+# If `dconf read` returns nothing, there is no entry in the user's dconf
+# database, so gsettings will just use the system default
+if [ ! -z "$(dconf read /org/gnome/shell/favorite-apps)" ]
+then
+    # Otherwise if user has set favorites, prepend Cosmic favorites
+    pop-cosmic-favorites
+fi
+
+echo "3" > "${CACHE_PATH}"
+
+fi
